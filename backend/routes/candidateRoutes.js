@@ -7,6 +7,7 @@ const roleMiddleware = require("../middleware/roleMiddleware");
 
 const {
   getCandidateProfile,
+  updateCandidateProfile,
 } = require("../controllers/candidateController");
 
 // ===============================
@@ -19,6 +20,13 @@ router.get(
   authMiddleware,
   roleMiddleware("candidate"),
   getCandidateProfile
+);
+// Update Candidate Profile
+router.put(
+  "/profile",
+  authMiddleware,
+  roleMiddleware("candidate"),
+  updateCandidateProfile
 );
 
 module.exports = router;
