@@ -66,8 +66,42 @@ const updateCandidateProfile = async (req, res) => {
     });
   }
 };
+/**
+ * @desc    Upload Candidate Resume
+ * @route   POST /api/candidate/resume
+ * @access  Private (Candidate)
+ */
+const uploadCandidateResume = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "Please upload a PDF resume.",
+      });
+    }
+
+    const updatedCandidate =
+      await candidateService.uploadCandidateResume(userId, req.file);
+
+    return res.status(200).json({
+      success: true,
+      message: "Resume uploaded successfully.",
+      data: updatedCandidate,
+    });
+  } catch (error) {
+    console.error("Upload Resume Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+  }
+};
 
 module.exports = {
   getCandidateProfile,
   updateCandidateProfile,
+  uploadCandidateResume,
 };

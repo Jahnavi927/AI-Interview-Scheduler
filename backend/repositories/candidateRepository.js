@@ -38,7 +38,29 @@ const updateCandidateProfile = async (userId, profileData) => {
   return data;
 };
 
+/**
+ * Update Candidate Resume URL
+ */
+const updateCandidateResume = async (userId, resumeUrl) => {
+  const { data, error } = await supabase
+    .from("candidates")
+    .update({
+      resume_url: resumeUrl,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", userId)
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+};
+
 module.exports = {
   getCandidateProfileByUserId,
   updateCandidateProfile,
+  updateCandidateResume,
 };
