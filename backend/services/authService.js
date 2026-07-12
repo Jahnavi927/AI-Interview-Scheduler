@@ -24,12 +24,16 @@ const registerUser = async ({ name, email, password, role }) => {
     role,
   };
 
-  // Save to database
+  // Save user
   const user = await authRepository.createUser(newUser);
+
+  // Automatically create candidate profile
+  if (user.role === "candidate") {
+    await authRepository.createCandidateProfile(user.id);
+  }
 
   return user;
 };
-
 // ==========================
 // Login User
 // ==========================

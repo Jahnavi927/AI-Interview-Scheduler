@@ -29,8 +29,26 @@ const createUser = async (userData) => {
 
   return data;
 };
+// Create candidate profile
+const createCandidateProfile = async (userId) => {
+  const { data, error } = await supabase
+    .from("candidates")
+    .insert([
+      {
+        user_id: userId,
+      },
+    ])
+    .select()
+    .single();
 
+  if (error) {
+    throw error;
+  }
+
+  return data;
+};
 module.exports = {
   findUserByEmail,
   createUser,
+  createCandidateProfile,
 };

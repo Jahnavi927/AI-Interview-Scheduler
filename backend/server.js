@@ -3,6 +3,7 @@ const cors = require("cors");
 require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
+const candidateRoutes = require("./routes/candidateRoutes"); // NEW
 
 const app = express();
 
@@ -11,12 +12,13 @@ app.use(express.json());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/candidate", candidateRoutes); // NEW
 
 // Test Route
 app.get("/", (req, res) => {
   res.json({
     success: true,
-    message: "🚀 AI Interview Scheduler API Running"
+    message: "🚀 AI Interview Scheduler API Running",
   });
 });
 
