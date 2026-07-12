@@ -1,5 +1,8 @@
 const authService = require("../services/authService");
 
+// ==========================
+// Register Controller
+// ==========================
 const register = async (req, res) => {
   try {
     const user = await authService.registerUser(req.body);
@@ -23,6 +26,28 @@ const register = async (req, res) => {
   }
 };
 
+// ==========================
+// Login Controller
+// ==========================
+const login = async (req, res) => {
+  try {
+    const result = await authService.loginUser(req.body);
+
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token: result.token,
+      user: result.user,
+    });
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   register,
+  login,
 };
