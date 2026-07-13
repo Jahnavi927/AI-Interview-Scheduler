@@ -24,6 +24,26 @@ const analyzeResume = async (req, res) => {
   }
 };
 
+const getResumeAnalysis = async (req, res) => {
+  try {
+    const analysis = await aiService.getResumeAnalysis(req.user.id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Resume analysis fetched successfully.",
+      data: analysis,
+    });
+  } catch (error) {
+    console.error("Get Resume Analysis Error:", error);
+
+    return res.status(404).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   analyzeResume,
+  getResumeAnalysis,
 };

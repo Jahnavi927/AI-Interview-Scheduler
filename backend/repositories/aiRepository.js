@@ -6,7 +6,15 @@ const supabase = require("../config/supabase");
 const saveResumeAnalysis = async (analysisData) => {
   const { data, error } = await supabase
     .from("resume_analysis")
-    .insert([analysisData])
+    .upsert(
+      {
+        ...analysisData,
+        updated_at: new Date().toISOString(),
+      },
+      {
+        onConflict: "candidate_id",
+      }
+    )
     .select()
     .single();
 
@@ -18,14 +26,13 @@ const saveResumeAnalysis = async (analysisData) => {
 };
 
 /**
- * Get Resume Analysis by Candidate ID
+ * Get Resume Analysis
  */
-const getResumeAnalysisByCandidateId = async (candidateId) => {
+const getResumeAnalysis = async (candidateId) => {
   const { data, error } = await supabase
     .from("resume_analysis")
     .select("*")
     .eq("candidate_id", candidateId)
-    .order("created_at", { ascending: false })
     .maybeSingle();
 
   if (error) {
@@ -37,5 +44,5 @@ const getResumeAnalysisByCandidateId = async (candidateId) => {
 
 module.exports = {
   saveResumeAnalysis,
-  getResumeAnalysisByCandidateId,
+  getResumeAnalysis,
 };

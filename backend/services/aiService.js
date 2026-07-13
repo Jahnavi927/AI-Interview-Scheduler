@@ -16,52 +16,111 @@ const {
   resumeAnalysisPrompt,
 } = require("../ai/prompts");
 
+/**
+ * Remove markdown from Gemini response before parsing JSON
+ */
 const cleanJson = (text) => {
   return text
     .replace(/```json/g, "")
     .replace(/```/g, "")
     .trim();
 };
+
 /**
- * Analyze Resume - Phase 1
- * Get Candidate -> Download Resume -> Extract PDF Text
+ * Analyze Resume
  */
 const analyzeResume = async (userId) => {
-  // Get candidate profile
-  const candidate = await candidateRepository.getCandidateProfileByUserId(userId);
+  // Get candidate
+  const candidate =
+    await candidateRepository.getCandidateProfileByUserId(userId);
 
   if (!candidate) {
     throw new Error("Candidate profile not found.");
   }
 
-  // Check resume exists
+  // Check resume
   if (!candidate.resume_url) {
     throw new Error("Resume not uploaded.");
   }
 
-  // Download resume from Supabase Storage
+  // Download resume
   const resumeBuffer = await downloadResume(candidate.resume_url);
 
-  // Extract text from PDF
+  // Extract PDF text
   const resumeText = await extractTextFromPDF(resumeBuffer);
 
   if (!resumeText?.trim()) {
-     throw new Error("Unable to extract text from resume.");
-}
-  // Phase 1: Return extracted text only
+    throw new Error("Unable to extract text from resume.");
+  }
+
+  // Build Gemini prompt
   const prompt = resumeAnalysisPrompt(resumeText);
 
-const response = await ai.models.generateContent({
-  model: "gemini-flash-latest",
-  contents: prompt,
-});
+  // Call Gemini
+  const response = await ai.models.generateContent({
+    model: "gemini-flash-latest",
+    contents: prompt,
+  });
 
-return {
-  candidateId: candidate.id,
-  rawResponse: response.text,
+  // Parse JSON
+  const analysis = JSON.parse(cleanJson(response.text));
+
+  // Save to database
+  const savedAnalysis = await aiRepository.saveResumeAnalysis({
+    candidate_id: candidate.id,
+
+    summary: analysis.summary,
+
+    technical_skills: analysis.technicalSkills,
+
+    soft_skills: analysis.softSkills,
+
+    experience: analysis.experience,
+
+    education: analysis.education,
+
+    projects: analysis.projects,
+
+    certifications: analysis.certifications,
+
+    resume_score: analysis.resumeScore,
+
+    missing_skills: analysis.missingSkills,
+
+    strengths: analysis.strengths,
+
+    weaknesses: analysis.weaknesses,
+
+    recommended_role: analysis.recommendedRole,
+
+    interview_questions: analysis.interviewQuestions,
+  });
+
+  return savedAnalysis;
 };
+
+/**
+ * Get Resume Analysis
+ */
+const getResumeAnalysis = async (userId) => {
+  const candidate =
+    await candidateRepository.getCandidateProfileByUserId(userId);
+
+  if (!candidate) {
+    throw new Error("Candidate profile not found.");
+  }
+
+  const analysis =
+    await aiRepository.getResumeAnalysis(candidate.id);
+
+  if (!analysis) {
+    throw new Error("Resume analysis not found.");
+  }
+
+  return analysis;
 };
 
 module.exports = {
   analyzeResume,
+  getResumeAnalysis,
 };
