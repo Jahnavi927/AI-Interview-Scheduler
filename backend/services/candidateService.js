@@ -1,5 +1,8 @@
 const candidateRepository = require("../repositories/candidateRepository");
-const { uploadResume } = require("../utils/supabaseStorage");
+const {
+  uploadResume,
+  getSignedResumeUrl,
+} = require("../utils/supabaseStorage");
 
 /**
  * Get Candidate Profile
@@ -50,8 +53,31 @@ const uploadCandidateResume = async (userId, file) => {
   return updatedCandidate;
 };
 
+/**
+ * Get Candidate Resume
+ */
+const getCandidateResume = async (userId) => {
+  const candidate =
+    await candidateRepository.getCandidateProfileByUserId(userId);
+
+  if (!candidate) {
+    throw new Error("Candidate profile not found");
+  }
+
+  if (!candidate.resume_url) {
+    throw new Error("Resume not found");
+  }
+
+  const signedUrl = await getSignedResumeUrl(candidate.resume_url);
+
+  return {
+    resumeUrl: signedUrl,
+  };
+};
+
 module.exports = {
   getCandidateProfile,
   updateCandidateProfile,
   uploadCandidateResume,
+  getCandidateResume,
 };

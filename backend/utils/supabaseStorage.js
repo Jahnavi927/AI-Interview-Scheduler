@@ -27,7 +27,24 @@ const uploadResume = async (file, userId) => {
 
   return filePath;
 };
+/**
+ * Generate Signed URL for Resume
+ * @param {String} filePath
+ * @returns {String} signedUrl
+ */
+const getSignedResumeUrl = async (filePath) => {
+  const { data, error } = await supabase.storage
+    .from("resume-files")
+    .createSignedUrl(filePath, 60); // valid for 60 seconds
+
+  if (error) {
+    throw error;
+  }
+
+  return data.signedUrl;
+};
 
 module.exports = {
   uploadResume,
+  getSignedResumeUrl,
 };

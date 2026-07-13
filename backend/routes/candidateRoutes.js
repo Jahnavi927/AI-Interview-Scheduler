@@ -10,11 +10,13 @@ const {
   getCandidateProfile,
   updateCandidateProfile,
   uploadCandidateResume,
+  getCandidateResume,
+  testGemini,
 } = require("../controllers/candidateController");
 
-// ===============================
+// ==================================
 // Candidate Routes
-// ===============================
+// ==================================
 
 // Get Candidate Profile
 router.get(
@@ -39,6 +41,22 @@ router.post(
   roleMiddleware("candidate"),
   upload.single("resume"),
   uploadCandidateResume
+);
+
+// Get Resume (Signed URL)
+router.get(
+  "/resume",
+  authMiddleware,
+  roleMiddleware("candidate"),
+  getCandidateResume
+);
+
+// Test Gemini AI (Temporary Route)
+router.post(
+  "/test-ai",
+  authMiddleware,
+  roleMiddleware("candidate"),
+  testGemini
 );
 
 module.exports = router;

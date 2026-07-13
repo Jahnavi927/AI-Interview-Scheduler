@@ -100,8 +100,62 @@ const uploadCandidateResume = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Get Candidate Resume
+ * @route   GET /api/candidate/resume
+ * @access  Private (Candidate)
+ */
+const getCandidateResume = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const data = await candidateService.getCandidateResume(userId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Resume URL generated successfully.",
+      data,
+    });
+  } catch (error) {
+    console.error("Get Resume Error:", error);
+
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+const ai = require("../utils/gemini");
+
+/**
+ * @desc Test Gemini
+ * @route POST /api/candidate/test-ai
+ */
+const testGemini = async (req, res) => {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: "Say hello to Jahnavi. Respond in one sentence.",
+    });
+
+    return res.status(200).json({
+      success: true,
+      response: response.text,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getCandidateProfile,
   updateCandidateProfile,
   uploadCandidateResume,
+  getCandidateResume,
+  testGemini,
 };
