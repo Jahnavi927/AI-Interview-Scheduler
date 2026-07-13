@@ -7,6 +7,7 @@ const candidateRoutes = require("./routes/candidateRoutes"); // NEW
 const aiRoutes = require("./routes/aiRoutes");
 const recruiterRoutes = require("./routes/recruiterRoutes");
 const jobRoutes = require("./routes/jobRoutes");
+const applicationRoutes = require("./routes/applicationRoutes");
 const app = express();
 
 app.use(cors());
@@ -18,7 +19,7 @@ app.use("/api/candidate", candidateRoutes); // NEW
 app.use("/api/ai", aiRoutes);
 app.use("/api/recruiter", recruiterRoutes);
 app.use("/api/jobs", jobRoutes);
-
+app.use("/api/applications", applicationRoutes);
 
 // Test Route
 app.get("/", (req, res) => {
