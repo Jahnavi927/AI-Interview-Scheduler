@@ -49,11 +49,17 @@ const analyzeResume = async (userId) => {
      throw new Error("Unable to extract text from resume.");
 }
   // Phase 1: Return extracted text only
-  return {
-    candidateId: candidate.id,
-    resumePath: candidate.resume_url,
-    extractedText: resumeText,
-  };
+  const prompt = resumeAnalysisPrompt(resumeText);
+
+const response = await ai.models.generateContent({
+  model: "gemini-flash-latest",
+  contents: prompt,
+});
+
+return {
+  candidateId: candidate.id,
+  rawResponse: response.text,
+};
 };
 
 module.exports = {
