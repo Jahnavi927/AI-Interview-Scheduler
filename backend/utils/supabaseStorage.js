@@ -43,8 +43,28 @@ const getSignedResumeUrl = async (filePath) => {
 
   return data.signedUrl;
 };
+/**
+ * Download Resume from Supabase Storage
+ * @param {String} filePath
+ * @returns {Buffer}
+ */
+const downloadResume = async (filePath) => {
+  const { data, error } = await supabase.storage
+    .from("resume-files")
+    .download(filePath);
+
+  if (error) {
+    throw error;
+  }
+
+  // Convert Blob → Buffer (Node.js)
+  const arrayBuffer = await data.arrayBuffer();
+  console.log("Downloaded file size:", arrayBuffer.byteLength);
+  return Buffer.from(arrayBuffer);
+};
 
 module.exports = {
   uploadResume,
   getSignedResumeUrl,
+  downloadResume,
 };

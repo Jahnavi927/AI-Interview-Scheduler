@@ -1,23 +1,24 @@
-const fs = require("fs");
 const pdf = require("pdf-parse");
 
 /**
- * Extract text from a PDF file.
- * @param {string} filePath - Absolute or relative path to the PDF file.
- * @returns {Promise<string>} Extracted text
+ * Extract text from PDF Buffer
+ * @param {Buffer} pdfBuffer
+ * @returns {Promise<string>}
  */
-const extractTextFromPDF = async (filePath) => {
+const extractTextFromPDF = async (pdfBuffer) => {
   try {
-    // Read PDF file
-    const dataBuffer = fs.readFileSync(filePath);
+    console.log("Buffer Length:", pdfBuffer.length);
 
-    // Parse PDF
-    const data = await pdf(dataBuffer);
+    const data = await pdf(pdfBuffer);
 
-    // Return extracted text
+    console.log("Pages:", data.numpages);
+    console.log("Text Length:", data.text.length);
+
     return data.text.trim();
   } catch (error) {
-    console.error("PDF Parsing Error:", error.message);
+    console.error("PDF Parse Error:");
+    console.error(error);
+
     throw new Error("Failed to extract text from PDF.");
   }
 };
